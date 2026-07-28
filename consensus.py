@@ -5,11 +5,13 @@ import scipy as sp
 from sklearn import cluster
 from tqdm import tqdm
 
+# vanilla cnmf implementation?
+
 class ConsensusFactorModel:
     def __init__(self, k, n_reps = 10, random_states = None, model_params = {}):
         self.k = k
         self.n_reps = n_reps
-        self.random_states = list(range(self.n_reps)) if random_states is None else random_states
+        self.random_states = list(range(self.n_reps)) if random_states is None else random_states # in paper
         self.models = [factor.LinearFactorModel(self.k, random_state = s, **model_params) for s in self.random_states]
         self.factor_keys = ["Ve", "Vm", "Vb_0", "Vb_1"]
     def fit(self, data_dict):
@@ -28,9 +30,9 @@ class ConsensusFactorModel:
         self.is_outlier = self.mean_dist_to_k > np.quantile(self.mean_dist_to_k, q)
     def get_consensus_factors(self, outlier_params = {}):
         self.aggregate_factors()
-        self.detect_outliers(**outlier_params)
+        self.detect_outliers(**outlier_params) # adds all of outlier params dictionary into this
         factors = self.factor_aggregate
-        self.kmeans_op = sk.cluster.KMeans(n_clusters=self.k).fit(factors[:, ~self.is_outlier].T)
+        self.kmeans_op = sk.cluster.KMeans(n_clusters=self.k).fit(factors[:, ~self.is_outlier].T) # this is using outlier params to plot everything except outliers
         self.factor_clusts = self.kmeans_op.predict(factors.T)
         self.factor_clusts[self.is_outlier] = -1
         factors_raw = {x : np.hstack([m.factors[x] for m in self.models]) for x in self.factor_keys}
