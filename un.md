@@ -1,0 +1,1 @@
+consensus.py - directly consensus nmf implementation. takes hints from Brunet, J.P., Tamayo, P., Golub, T.R. & Mesirov, J.P. (2004). Metagenes and molecular pattern discovery using matrix factorization. PNAS 101(12):4164–9.? 
